@@ -1,0 +1,150 @@
+# --------------------------------------------
+# Student Grade Calculator
+# Created by: Prashant Murkute
+# Description: A comprehensive grade calculator
+# that calculates grades, comments, and statistics
+# --------------------------------------------
+
+import os
+
+# Function to calculate grade
+def calculate_grade(avg):
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    else:
+        return "F"
+
+# Function to give comment based on grade
+def grade_comment(grade):
+    comments = {
+        "A": "Excellent Performance!",
+        "B": "Very Good Job!",
+        "C": "Good Effort!",
+        "D": "Needs Improvement.",
+        "F": "Failed. Work Harder!"
+    }
+    return comments.get(grade, "")
+
+# Function to get valid marks
+def get_valid_marks(subject_name):
+    while True:
+        try:
+            marks = float(input(f"Enter marks for {subject_name} (0-100): "))
+            if 0 <= marks <= 100:
+                return marks
+            else:
+                print("Marks must be between 0 and 100.")
+        except ValueError:
+            print("Invalid input! Please enter numeric value.")
+
+# Main Program
+def main():
+    students = []
+
+    while True:
+        print("\n===== Student Grade Calculator =====")
+        print("1. Add Students")
+        print("2. View Results")
+        print("3. Search Student")
+        print("4. Save Results to File")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            while True:
+                try:
+                    count = int(input("How many students? "))
+                    if count > 0:
+                        break
+                    else:
+                        print("Enter a positive number.")
+                except ValueError:
+                    print("Invalid input! Enter a number.")
+
+            for i in range(count):
+                print(f"\n--- Student {i+1} ---")
+                name = input("Enter student name: ")
+
+                m1 = get_valid_marks("Subject 1")
+                m2 = get_valid_marks("Subject 2")
+                m3 = get_valid_marks("Subject 3")
+
+                avg = (m1 + m2 + m3) / 3
+                grade = calculate_grade(avg)
+                comment = grade_comment(grade)
+
+                student_data = {
+                    "name": name,
+                    "marks": [m1, m2, m3],
+                    "average": round(avg, 2),
+                    "grade": grade,
+                    "comment": comment
+                }
+
+                students.append(student_data)
+
+            print("Students added successfully!")
+
+        elif choice == "2":
+            if not students:
+                print("No student data available.")
+                continue
+
+            print("\n{:<15} {:<10} {:<10} {:<10} {:<10} {:<5} {:<25}".format(
+                "Name", "Sub1", "Sub2", "Sub3", "Average", "Grade", "Comment"
+            ))
+            print("-" * 85)
+
+            for s in students:
+                print("{:<15} {:<10} {:<10} {:<10} {:<10} {:<5} {:<25}".format(
+                    s["name"],
+                    s["marks"][0],
+                    s["marks"][1],
+                    s["marks"][2],
+                    s["average"],
+                    s["grade"],
+                    s["comment"]
+                ))
+
+            averages = [s["average"] for s in students]
+            print("\nClass Statistics:")
+            print(f"Average Marks: {round(sum(averages)/len(averages),2)}")
+            print(f"Highest Marks: {max(averages)}")
+            print(f"Lowest Marks: {min(averages)}")
+
+        elif choice == "3":
+            search_name = input("Enter student name to search: ")
+            found = False
+            for s in students:
+                if s["name"].lower() == search_name.lower():
+                    print(f"\nResult for {s['name']}:")
+                    print(f"Average: {s['average']}")
+                    print(f"Grade: {s['grade']}")
+                    print(f"Comment: {s['comment']}")
+                    found = True
+                    break
+            if not found:
+                print("Student not found.")
+
+        elif choice == "4":
+            with open("results.txt", "w") as file:
+                for s in students:
+                    file.write(f"{s['name']} - Avg: {s['average']} - Grade: {s['grade']}\n")
+            print("Results saved to results.txt")
+
+        elif choice == "5":
+            print("Thank you for using Grade Calculator!")
+            break
+
+        else:
+            print("Invalid choice! Try again.")
+
+if __name__ == "__main__":
+    main()
